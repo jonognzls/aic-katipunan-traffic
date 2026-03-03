@@ -1,0 +1,39 @@
+name: Katipunan Traffic Data Collection
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes, 24/7
+  workflow_dispatch:          # allows manual trigger from GitHub UI
+
+jobs:
+  collect-traffic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4        # kill if it hangs (stays under 5-min window)
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install selenium webdriver-manager pandas gspread gspread-dataframe \
+            google-auth-oauthlib google-api-python-client
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Write service account credentials
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        run: echo "$SERVICE_ACCOUNT_JSON" > service_account.json
+
+      - name: Run traffic collector
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        run: python final-realtime-traffic-data.py

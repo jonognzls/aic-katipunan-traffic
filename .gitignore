@@ -1,0 +1,14 @@
+# Google Cloud credentials — NEVER commit this
+service_account.json
+
+# Screenshots (temporary files)
+traffic_*.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Excel backup
+*.xlsx
