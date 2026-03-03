@@ -1,4 +1,5 @@
 import io
+from zoneinfo import ZoneInfo
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -52,7 +53,7 @@ def upload_bytes_to_drive(image_bytes, file_name):
         
         return file.get('webViewLink')
     except Exception as e:
-        print(f"[{datetime.now()}] Drive Upload Error: {e}")
+        print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Drive Upload Error: {e}")
         return "Upload Failed"
 
 # MAIN — runs once per invocation
@@ -71,7 +72,7 @@ try:
     driver.get(url)
     wait = WebDriverWait(driver, 30)
 
-    print(f"[{datetime.now()}] Loading route info...")
+    print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Loading route info...")
     wait.until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'min')]")))
     time.sleep(5)
 
@@ -83,14 +84,14 @@ try:
     except:
         pass
 
-    print(f"[{datetime.now()}] Capturing snapshot...")
+    print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Capturing snapshot...")
     try:
         map_element = driver.find_element(By.TAG_NAME, "canvas")
         image_data = map_element.screenshot_as_png
     except:
         image_data = driver.get_screenshot_as_png()
 
-    img_name = f"traffic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    img_name = f"traffic_{datetime.now(ZoneInfo('Asia/Manila')).strftime('%Y%m%d_%H%M%S')}.png"
     snapshot_url = upload_bytes_to_drive(image_data, img_name)
 
     # Extraction
@@ -131,7 +132,7 @@ try:
         avg_speed = "Error"
 
     # Sheet Update
-    print(f"[{datetime.now()}] Updating Google Sheet...")
+    print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Updating Google Sheet...")
     data = {
         "Origin": ["SMDC BLUE"],
         "Destination": ["U.P. Town Center"],
@@ -140,7 +141,7 @@ try:
         "Avg_Speed_KMH": [avg_speed],
         "Traffic_Status": [color_label],
         "Snapshot_Link": [snapshot_url],
-        "Timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+        "Timestamp": [datetime.now(ZoneInfo('Asia/Manila')).strftime("%Y-%m-%d %H:%M:%S")]
     }
 
     df = pd.DataFrame(data)
@@ -150,14 +151,14 @@ try:
         existing_df = pd.DataFrame(records)
         updated_df = pd.concat([existing_df, df], ignore_index=True)
         set_with_dataframe(sheet, updated_df)
-        print(f"[{datetime.now()}] Success! Speed: {avg_speed} km/h ({color_label}) logged.\n")
+        print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Success! Speed: {avg_speed} km/h ({color_label}) logged.\n")
     except Exception as sheet_err:
-        print(f"[{datetime.now()}] Sheet Update Failed: {sheet_err}")
+        print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Sheet Update Failed: {sheet_err}")
 
     driver.quit()
 
 except Exception as e:
-    print(f"[{datetime.now()}] Error: {e}")
+    print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Error: {e}")
     if driver:
         driver.quit()
     raise
