@@ -6,11 +6,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-import pandas as pd
 import time
 from datetime import datetime
 import gspread
-from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -133,24 +131,17 @@ try:
 
     # Sheet Update
     print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Updating Google Sheet...")
-    data = {
-        "Origin": ["SMDC BLUE"],
-        "Destination": ["U.P. Town Center"],
-        "Travel_Time": [travel_time],
-        "Distance": [distance],
-        "Avg_Speed_KMH": [avg_speed],
-        "Traffic_Status": [color_label],
-        "Snapshot_Link": [snapshot_url],
-        "Timestamp": [datetime.now(ZoneInfo('Asia/Manila')).strftime("%Y-%m-%d %H:%M:%S")]
-    }
-
-    df = pd.DataFrame(data)
-
     try:
-        records = sheet.get_all_records()
-        existing_df = pd.DataFrame(records)
-        updated_df = pd.concat([existing_df, df], ignore_index=True)
-        set_with_dataframe(sheet, updated_df)
+        sheet.append_row([
+            "SMDC BLUE",
+            "U.P. Town Center",
+            travel_time,
+            distance,
+            avg_speed,
+            color_label,
+            snapshot_url,
+            datetime.now(ZoneInfo('Asia/Manila')).strftime("%Y-%m-%d %H:%M:%S")
+        ])
         print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Success! Speed: {avg_speed} km/h ({color_label}) logged.\n")
     except Exception as sheet_err:
         print(f"[{datetime.now(ZoneInfo('Asia/Manila'))}] Sheet Update Failed: {sheet_err}")
