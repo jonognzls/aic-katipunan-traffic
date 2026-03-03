@@ -21,9 +21,7 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: |
-          pip install selenium webdriver-manager pandas gspread gspread-dataframe \
-            google-auth-oauthlib google-api-python-client
+        run: pip install -r requirements.txt
 
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
